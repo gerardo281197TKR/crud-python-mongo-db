@@ -3,20 +3,19 @@ from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 from bson import ObjectId
 
+from controllers.userController import UserController
+user_controller = UserController() 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tu_secreto_aqui'
 socketio = SocketIO(app, cors_allowed_origins="*")  # Habilitar CORS si es necesario
 
-
 # Conexión al servidor MongoDB
 client = MongoClient("mongodb://localhost:27017/") 
-
 # Seleccionar una base de datos
 db = client["labuena"]
-
 # Seleccionar una colección
 collection = db["usaurios"]
-
 print("Conexión exitosa a MongoDB!")
 
 # Convertir ObjectId a string
@@ -32,6 +31,10 @@ def index():
     # Obtener y serializar documentos
     usuarios = [serialize_mongo_document(doc) for doc in collection.find()]
     return jsonify(usuarios)  # Devolver la lista como JSON
+
+@app.route('/list/users',methods=["GET"])
+def testc():
+    return user_controller.list(db)
 
 @app.route('/create', methods=['POST'])
 def create_document():
